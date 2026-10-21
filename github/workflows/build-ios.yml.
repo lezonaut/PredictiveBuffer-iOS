@@ -1,0 +1,40 @@
+
+name: Build PredictiveBuffer iOS
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'CMakeLists.txt'
+      - 'mod.json'
+      - '.github/workflows/build-ios.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-ios:
+    name: Build for iOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build Geode mod
+        id: build
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          target: iOS
+          sdk: given
+          path: .
+
+      - name: Upload iOS build
+        uses: actions/upload-artifact@v4
+        with:
+          name: PredictiveBuffer-iOS
+          path: ${{ steps.build.outputs.build-output }}/*.geode
+          if-no-files-found: error
